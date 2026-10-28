@@ -445,8 +445,17 @@ def _patterns(r: _Reader, name: str, protected: tuple[str, ...]) -> tuple[str, .
     patterns = r.require(name, _strs)
     if not patterns:
         raise r.error(name, "must not be empty")
+    if any(not p for p in patterns):
+        raise r.error(name, "patterns must not be empty strings")
     if _only_protected(patterns, protected):
         raise r.error(name, "only matches protected units")
+    return patterns
+
+
+def _optional_patterns(r: _Reader, name: str) -> tuple[str, ...]:
+    patterns = r.get(name, _strs, _NO_STRS)
+    if any(not p for p in patterns):
+        raise r.error(name, "patterns must not be empty strings")
     return patterns
 
 
@@ -469,7 +478,7 @@ def _when(r: _Reader, protected: tuple[str, ...], avc_burst: int) -> When:
         )
     else:
         when = AvcWhen(
-            scontext_types=r.get("scontext_types", _strs, _NO_STRS),
+            scontext_types=_optional_patterns(r, "scontext_types"),
             min_count=r.get("min_count", _int_in(1, 10**6), 1),
         )
         # a burst incident is raised once avc_burst denials are seen, so a

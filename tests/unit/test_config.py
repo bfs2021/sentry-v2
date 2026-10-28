@@ -180,6 +180,22 @@ def test_only_protected(tmp_path: Path, when: str, key: str) -> None:
     assert got == f"x.toml: policy[0].when.{key}: only matches protected units"
 
 
+@pytest.mark.parametrize(
+    ("when", "key"),
+    [
+        ('signal = "unit_failed"\nunits = ["", "sshd.service"]', "units"),
+        (
+            'signal = "psi"\nresource = "memory"\nthreshold = "300ms/2s"\ncgroups = [""]',
+            "cgroups",
+        ),
+        ('signal = "avc"\nscontext_types = ["", "httpd_t"]', "scontext_types"),
+    ],
+)
+def test_empty_patterns_are_refused(tmp_path: Path, when: str, key: str) -> None:
+    got = err(tmp_path, x=policy_text(when=when))
+    assert got == f"x.toml: policy[0].when.{key}: patterns must not be empty strings"
+
+
 def test_wide_globs_and_extra_protection(tmp_path: Path) -> None:
     ok = 'signal = "unit_failed"\nunits = ["*.service"]'
     assert load(tmp_path, x=policy_text(when=ok)).policies
