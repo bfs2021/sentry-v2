@@ -11,7 +11,7 @@ import sys
 import time
 import unicodedata
 from collections.abc import Callable
-from dataclasses import replace
+from dataclasses import fields, replace
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -298,20 +298,36 @@ def _validate(args: argparse.Namespace) -> int:
     return 0
 
 
-def _event(d: dict[str, Any], default_ts: int) -> Event:
+def _unknown_field(d: dict[str, Any], cls: type) -> str | None:
+    extra = sorted(set(d) - {f.name for f in fields(cls)})
+    return extra[0] if extra else None
+
+
+def _event(d: object, default_ts: int, index: int) -> Event:
+    if not isinstance(d, dict):
+        raise ValueError(f"event {index} must be a JSON object")
     d = dict(d)
     kind = d.pop("kind", None)
     d.setdefault("ts_us", default_ts)
     match kind:
         case "unit_failed":
+            if (field := _unknown_field(d, UnitEvent)) is not None:
+                raise ValueError(f"event {index} (unit_failed) has an unknown field {field!r}")
             return UnitEvent(kind="failed", **d)
         case "psi":
             d["kind"] = d.pop("pressure", "full")
+            if (field := _unknown_field(d, PsiEvent)) is not None:
+                raise ValueError(f"event {index} (psi) has an unknown field {field!r}")
             return PsiEvent(**d)
         case "avc":
-            d["perms"] = tuple(d.get("perms", ()))
+            perms = d.get("perms", ())
+            if not isinstance(perms, list) or not all(isinstance(p, str) for p in perms):
+                raise ValueError(f"event {index} (avc): perms must be a list of strings")
+            d["perms"] = tuple(perms)
+            if (field := _unknown_field(d, AvcEvent)) is not None:
+                raise ValueError(f"event {index} (avc) has an unknown field {field!r}")
             return AvcEvent(**d)
-    raise ValueError(f'"kind" must be unit_failed, psi or avc, not {kind!r}')
+    raise ValueError(f"event {index}: 'kind' must be unit_failed, psi or avc, not {kind!r}")
 
 
 _KIND_OF_SOURCE = {"journal": "unit_failed", "psi": "psi", "audit": "avc"}
@@ -394,7 +410,7 @@ def _plan(args: argparse.Namespace) -> list[dict[str, str]]:
     if isinstance(raw, dict) and raw.get("schema") == SCHEMA_ID:
         raw = _bundle_events(raw)
     now_us = int(time.time() * _US)
-    events = [_event(d, now_us) for d in (raw if isinstance(raw, list) else [raw])]
+    events = [_event(d, now_us, i) for i, d in enumerate(raw if isinstance(raw, list) else [raw])]
     if not events:
         raise ValueError("it holds no events")
     engine = PolicyEngine(cfg.policies, lambda: 0.0)
@@ -426,10 +442,7 @@ def _test(args: argparse.Namespace) -> int:
         print(f"cannot read {_clean(e.filename or args.event)}: {_clean(e)}", file=sys.stderr)
         return 1
     except (ValueError, TypeError, KeyError) as e:
-        print(
-            f"cannot use {_clean(args.event)}: {_clean(e)}. Expected a JSON event or a list.",
-            file=sys.stderr,
-        )
+        print(f"cannot use {_clean(args.event)}: {_clean(e)}", file=sys.stderr)
         return 1
     if args.json:
         print(json.dumps(plans))

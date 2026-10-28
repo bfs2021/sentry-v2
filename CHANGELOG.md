@@ -19,6 +19,10 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 - An empty string in a policy's `units`, `cgroups` or `scontext_types` list
   was accepted; the pattern matches nothing, so the policy loaded and never
   fired. It is now refused when the config loads.
+- `sentry-v2ctl policy test --event` on JSON that is not shaped like an event
+  raised a Python error instead of naming the problem. Each entry is now
+  checked, and the error names the event number, the unknown field and the
+  expected type.
 
 ## [0.2.7] - 2026-10-28
 

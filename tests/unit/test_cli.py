@@ -327,6 +327,29 @@ def test_policy_test_bad_input(tmp_path, capsys):
     assert main(["policy", "test", "--event", str(f), *CFG]) == 1
 
 
+def test_policy_test_event_must_be_object(tmp_path, capsys):
+    assert main(_event(tmp_path, [1])) == 1
+    assert "event 0 must be a JSON object" in capsys.readouterr().err
+    assert main(_event(tmp_path, "x")) == 1
+    assert "event 0 must be a JSON object" in capsys.readouterr().err
+
+
+def test_policy_test_event_unknown_field_is_named(tmp_path, capsys):
+    bad = {"kind": "unit_failed", "unit": "batch-1.service", "reslt": "signal"}
+    assert main(_event(tmp_path, bad)) == 1
+    err = capsys.readouterr().err
+    assert "event 0 (unit_failed) has an unknown field 'reslt'" in err
+
+
+def test_policy_test_avc_perms_must_be_list(tmp_path, capsys):
+    avc = {
+        "kind": "avc", "serial": 1, "denied": True, "perms": "read",
+        "scontext": "u:r:httpd_t:s0", "scontext_type": "httpd_t", "tcontext": "x", "tclass": "file",
+    }  # fmt: skip
+    assert main(_event(tmp_path, avc)) == 1
+    assert "event 0 (avc): perms must be a list of strings" in capsys.readouterr().err
+
+
 def test_policy_test_missing_event_file(tmp_path, capsys):
     f = tmp_path / "missing.json"
     assert main(["policy", "test", "--event", str(f), *CFG]) == 1
