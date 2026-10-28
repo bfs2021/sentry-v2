@@ -23,6 +23,10 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 
 ### Fixed
 
+- `parse_duration` and `parse_size` now refuse a trailing newline, non-ASCII
+  digits, and durations that overflow to infinity. The old patterns used `$`
+  (which matches before a final newline) and `\d` (which matches every Unicode
+  digit).
 - A zero absolute `memory_high` in a throttle is now refused when the policy
   loads, matching the rejection of zero percentages.
 

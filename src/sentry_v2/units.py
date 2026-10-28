@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
 
-_DURATION = re.compile(r"^(\d+(?:\.\d+)?)(us|ms|s|m|h|d)$")
+_DURATION = re.compile(r"\A(\d+(?:\.\d+)?)(us|ms|s|m|h|d)\Z", re.ASCII)
 _DURATION_SCALE = {"us": 1e-6, "ms": 1e-3, "s": 1.0, "m": 60.0, "h": 3600.0, "d": 86400.0}
-_SIZE = re.compile(r"^(\d+)([KMGT]?)$")
+_SIZE = re.compile(r"\A(\d+)([KMGT]?)\Z", re.ASCII)
 _SIZE_SCALE = {"": 1, "K": 1024, "M": 1024**2, "G": 1024**3, "T": 1024**4}
-_PERCENT = re.compile(r"^(\d+(?:\.\d+)?)%$")
+_PERCENT = re.compile(r"\A(\d+(?:\.\d+)?)%\Z", re.ASCII)
 
 
 @dataclass(frozen=True)
@@ -29,7 +30,10 @@ def parse_duration(s: str) -> float:
         raise ValueError(
             f"invalid duration {s!r}: expected a number and one unit of us, ms, s, m, h, d"
         )
-    return float(m.group(1)) * _DURATION_SCALE[m.group(2)]
+    value = float(m.group(1)) * _DURATION_SCALE[m.group(2)]
+    if not math.isfinite(value):
+        raise ValueError(f"invalid duration {s!r}: value is too large")
+    return value
 
 
 def parse_size(s: str) -> int | Percent:

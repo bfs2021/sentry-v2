@@ -21,7 +21,20 @@ def test_parse_duration(s: str, expected: float) -> None:
     assert parse_duration(s) == pytest.approx(expected)
 
 
-@pytest.mark.parametrize("bad", ["", "10", "-5s", "1m30s", "5 minutes", "1e3s"])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "",
+        "10",
+        "-5s",
+        "1m30s",
+        "5 minutes",
+        "1e3s",
+        "10s\n",
+        "\u0661\u0660s",
+        "1" + "0" * 400 + "s",
+    ],
+)
 def test_parse_duration_rejects(bad: str) -> None:
     with pytest.raises(ValueError, match=re.escape(repr(bad))):
         parse_duration(bad)
@@ -35,7 +48,7 @@ def test_parse_size() -> None:
     assert parse_size("100%") == Percent(100.0)
 
 
-@pytest.mark.parametrize("bad", ["0%", "101%", "12X", "M", ""])
+@pytest.mark.parametrize("bad", ["0%", "101%", "12X", "M", "", "10M\n", "\u0661\u0660M"])
 def test_parse_size_rejects(bad: str) -> None:
     with pytest.raises(ValueError, match=re.escape(repr(bad))):
         parse_size(bad)
