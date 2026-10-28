@@ -382,6 +382,13 @@ def test_empty_events_and_limit(tmp_path, capsys):
     assert main(["incidents", "--limit", "0"]) == 2
 
 
+def test_nonnumber_limit_names_the_value(capsys):
+    assert main(["incidents", "--limit", "abc"]) == 2
+    err = capsys.readouterr().err
+    assert "must be a whole number, not 'abc'" in err
+    assert "_positive" not in err
+
+
 def test_broken_pipe(stub, capsys, monkeypatch):
     stub.replies["pause"] = {"ok": True, "result": {"paused": True}}
     monkeypatch.setattr("builtins.print", lambda *a, **k: (_ for _ in ()).throw(BrokenPipeError))

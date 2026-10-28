@@ -461,7 +461,10 @@ def _redact(args: argparse.Namespace) -> int:
 
 
 def _positive(v: str) -> int:
-    n = int(v)
+    try:
+        n = int(v)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"must be a whole number, not {v!r}") from None
     if n < 1:
         raise argparse.ArgumentTypeError("must be 1 or more")
     return n

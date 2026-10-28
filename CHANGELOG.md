@@ -14,6 +14,11 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 - Contributions now need a Developer Certificate of Origin sign-off
   (`git commit -s`), checked in CI.
 
+### Fixed
+
+- A non-number `--limit` on `incidents` now says `must be a whole number,
+  not 'abc'` instead of naming the private `_positive` helper.
+
 ## [0.2.6] - 2026-10-20
 
 ### Fixed
