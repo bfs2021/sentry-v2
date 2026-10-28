@@ -30,6 +30,9 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 - An empty `metrics.host` or `sinks.syslog.host` was accepted, and an empty
   metrics host made the daemon listen on every interface while its warning
   printed a blank address. Both are now refused when the config loads.
+- A zero `sinks.webhook.timeout` was accepted, and every delivery then failed
+  with `BlockingIOError` because the socket was left non-blocking. It is now
+  refused when the config loads.
 
 ## [0.2.6] - 2026-10-20
 

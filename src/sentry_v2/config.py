@@ -309,7 +309,7 @@ def _sinks(root: _Reader, state_dir: Path) -> SinksConfig:
             url=_url(w),
             hmac_key_file=w.require("hmac_key_file", _path),
             ca_file=w.get("ca_file", _path, None),
-            timeout=w.get("timeout", _duration, 10.0),
+            timeout=w.get("timeout", _pos_duration, 10.0),
         )
         w.finish()
 

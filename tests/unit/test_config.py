@@ -205,6 +205,10 @@ def test_window_must_be_a_multiple_of_2s(tmp_path: Path, threshold: str) -> None
         ),
         ('[sinks.syslog]\ntransport = "smtp"', "sinks.syslog.transport"),
         ('[sinks.syslog]\nhost = ""', "sinks.syslog.host"),
+        (
+            '[sinks.webhook]\nurl = "https://a.example"\nhmac_key_file = "/k"\ntimeout = "0s"',
+            "sinks.webhook.timeout",
+        ),
         ('[metrics]\nhost = ""', "metrics.host"),
         ('[sinks.file]\nmax_size = "5%"', "sinks.file.max_size"),
         ('[redaction]\npatterns = ["("]', "redaction.patterns"),
