@@ -32,6 +32,8 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 
 - A sink `url` of `https://` with no host was accepted and only failed at
   delivery time. The shared check now refuses it when the config loads.
+- An empty `sinks.elastic.index` was accepted, and every bundle was then
+  rejected by Elasticsearch. The key is required, so it is refused now.
 - Relative or non-normalised paths in single-path config keys (`daemon.state_dir`,
   `control.socket`, `sinks.file.dir`, and the `*_file` keys) are now refused
   instead of being resolved against the daemon's cwd at `/`. Secret keys

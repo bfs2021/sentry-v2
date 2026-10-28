@@ -365,7 +365,7 @@ def _sinks(root: _Reader, state_dir: Path) -> SinksConfig:
     if e := r.sub("elastic"):
         elastic = ElasticSinkConfig(
             url=_url(e),
-            index=e.require("index", _str),
+            index=e.require("index", _nonempty_str),
             api_key_file=e.get("api_key_file", _secret_path, None),
             username=e.get("username", _str, None),
             password_file=e.get("password_file", _secret_path, None),

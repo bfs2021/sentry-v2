@@ -230,6 +230,10 @@ def test_secret_keys_take_a_systemd_credential_name(tmp_path: Path) -> None:
         ('[sinks.splunk_hec]\nurl = "https://a"', "sinks.splunk_hec.token_file"),
         ('[sinks.elastic]\nurl = "https://a"\nindex = "i"', "sinks.elastic.api_key_file"),
         (
+            '[sinks.elastic]\nurl = "https://a"\nindex = ""\napi_key_file = "/k"',
+            "sinks.elastic.index",
+        ),
+        (
             '[sinks.elastic]\nurl = "https://a"\nindex = "i"\napi_key_file = "/k"\nusername = "u"\npassword_file = "/p"',
             "sinks.elastic.api_key_file",
         ),
