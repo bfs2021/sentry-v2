@@ -517,7 +517,7 @@ def _policy(
     seen: dict[str, Path],
     avc_burst: int,
 ) -> Policy:
-    name = r.require("name", _str)
+    name = r.require("name", _nonempty_str)
     if name in seen:
         raise r.error(
             "name", f"duplicate policy name {name!r} (first defined in {seen[name].name})"

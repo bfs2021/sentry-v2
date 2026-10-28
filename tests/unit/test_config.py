@@ -115,6 +115,15 @@ def test_duplicate_policy_names(tmp_path: Path) -> None:
     assert got.startswith("20-b.toml: policy[0].name: duplicate")
 
 
+def test_empty_policy_name(tmp_path: Path) -> None:
+    text = (
+        '[[policy]]\nname = ""\n[policy.when]\n'
+        'signal = "unit_failed"\nunits = ["batch-*.service"]\n'
+        '[[policy.do]]\naction = "notify"\n'
+    )
+    assert err(tmp_path, x=text) == "x.toml: policy[0].name: must not be empty"
+
+
 def test_throttle_needs_duration(tmp_path: Path) -> None:
     got = err(tmp_path, x=policy_text(do='action = "throttle"\ncpu_weight = 10'))
     assert got == "x.toml: policy[0].do[0].duration: is required"

@@ -11,6 +11,9 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 - A `redaction.patterns` entry that matches the empty string, such as `""`,
   `"x|"` or `"a*"`, is refused when the config loads instead of redacting
   every character of every bundle.
+- A policy with an empty `name` was accepted, leaving a blank column in
+  `sentry-v2ctl policies` and an empty value in the metric labels. It is now
+  refused when the config loads.
 
 ## [0.2.7] - 2026-10-28
 
