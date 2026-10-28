@@ -146,6 +146,13 @@ def _bytes(v: object) -> int:
     return size
 
 
+def _pos_bytes(v: object) -> int:
+    size = _bytes(v)
+    if size <= 0:
+        raise ValueError("must be above 0")
+    return size
+
+
 def _mode(v: object) -> Mode:
     return cast(Mode, _choice("dry-run", "enforce")(v))
 
@@ -298,8 +305,8 @@ def _sinks(root: _Reader, state_dir: Path) -> SinksConfig:
     f = _section(r, "file")
     file = FileSinkConfig(
         dir=f.get("dir", _path, state_dir / "bundles"),
-        max_age=f.get("max_age", _duration, fd.max_age),
-        max_size=f.get("max_size", _bytes, fd.max_size),
+        max_age=f.get("max_age", _pos_duration, fd.max_age),
+        max_size=f.get("max_size", _pos_bytes, fd.max_size),
     )
     f.finish()
 

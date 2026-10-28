@@ -211,6 +211,8 @@ def test_window_must_be_a_multiple_of_2s(tmp_path: Path, threshold: str) -> None
         ),
         ('[metrics]\nhost = ""', "metrics.host"),
         ('[sinks.file]\nmax_size = "5%"', "sinks.file.max_size"),
+        ('[sinks.file]\nmax_age = "0s"', "sinks.file.max_age"),
+        ('[sinks.file]\nmax_size = "0"', "sinks.file.max_size"),
         ('[redaction]\npatterns = ["("]', "redaction.patterns"),
         ("[metrics]\nport = 0", "metrics.port"),
         ("[limits]\nbreaker_window = 5", "limits.breaker_window"),
