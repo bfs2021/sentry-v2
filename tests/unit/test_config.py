@@ -69,6 +69,18 @@ def test_full_global_config() -> None:
     assert cfg.metrics.enabled and cfg.control.group == "ops"
 
 
+@pytest.mark.parametrize("pattern", ["", "x|", "a*"])
+def test_redaction_patterns_must_not_match_empty(tmp_path: Path, pattern: str) -> None:
+    got = err(tmp_path, f'[redaction]\npatterns = ["{pattern}"]')
+    assert got.startswith("main.toml: redaction.patterns:"), got
+    assert "matches the empty string" in got
+
+
+def test_redaction_normal_pattern_still_loads(tmp_path: Path) -> None:
+    cfg = load(tmp_path, "[redaction]\npatterns = ['(?i)secret=\\S+']")
+    assert cfg.redaction.patterns == (r"(?i)secret=\S+",)
+
+
 def test_policies_load() -> None:
     cfg = load_config(FIXTURES / "minimal.toml", FIXTURES / "policies.d")
     names = [p.name for p in cfg.policies]

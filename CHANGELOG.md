@@ -6,6 +6,12 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- A `redaction.patterns` entry that matches the empty string, such as `""`,
+  `"x|"` or `"a*"`, is refused when the config loads instead of redacting
+  every character of every bundle.
+
 ## [0.2.7] - 2026-10-28
 
 ### Changed

@@ -297,9 +297,11 @@ def _redaction(root: _Reader) -> RedactionConfig:
     patterns = r.get("patterns", _strs, _NO_STRS)
     for p in patterns:
         try:
-            re.compile(p)
+            compiled = re.compile(p)
         except re.error as e:
             raise r.error("patterns", f"invalid regex {p!r}: {e}") from None
+        if compiled.search(""):
+            raise r.error("patterns", f"pattern {p!r} matches the empty string")
     out = RedactionConfig(patterns=patterns, use_defaults=r.get("use_defaults", _bool, True))
     r.finish()
     return out
