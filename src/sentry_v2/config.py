@@ -64,6 +64,13 @@ def _str(v: object) -> str:
     return v
 
 
+def _nonempty_str(v: object) -> str:
+    s = _str(v)
+    if not s:
+        raise ValueError("must not be empty")
+    return s
+
+
 def _int(v: object) -> int:
     if isinstance(v, bool) or not isinstance(v, int):
         raise ValueError("must be an integer")
@@ -310,7 +317,7 @@ def _sinks(root: _Reader, state_dir: Path) -> SinksConfig:
     if s := r.sub("syslog"):
         sd = SyslogSinkConfig()
         syslog = SyslogSinkConfig(
-            host=s.get("host", _str, sd.host),
+            host=s.get("host", _nonempty_str, sd.host),
             port=s.get("port", _int_in(1, 65535), sd.port),
             transport=s.get("transport", _choice("udp", "tcp", "tls"), sd.transport),
             ca_file=s.get("ca_file", _path, None),
@@ -357,7 +364,7 @@ def _metrics(root: _Reader) -> MetricsConfig:
     r, d = _section(root, "metrics"), MetricsConfig()
     out = MetricsConfig(
         enabled=r.get("enabled", _bool, d.enabled),
-        host=r.get("host", _str, d.host),
+        host=r.get("host", _nonempty_str, d.host),
         port=r.get("port", _int_in(1, 65535), d.port),
     )
     r.finish()

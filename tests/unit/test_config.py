@@ -204,6 +204,8 @@ def test_window_must_be_a_multiple_of_2s(tmp_path: Path, threshold: str) -> None
             "sinks.elastic.username",
         ),
         ('[sinks.syslog]\ntransport = "smtp"', "sinks.syslog.transport"),
+        ('[sinks.syslog]\nhost = ""', "sinks.syslog.host"),
+        ('[metrics]\nhost = ""', "metrics.host"),
         ('[sinks.file]\nmax_size = "5%"', "sinks.file.max_size"),
         ('[redaction]\npatterns = ["("]', "redaction.patterns"),
         ("[metrics]\nport = 0", "metrics.port"),

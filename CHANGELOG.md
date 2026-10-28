@@ -27,6 +27,9 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 - Redaction now removes the whole of a quoted secret flag or pair, such as
   `--password "two words"` or `token='a b'`. Before, everything after the
   first space was left in the bundle.
+- An empty `metrics.host` or `sinks.syslog.host` was accepted, and an empty
+  metrics host made the daemon listen on every interface while its warning
+  printed a blank address. Both are now refused when the config loads.
 
 ## [0.2.6] - 2026-10-20
 
