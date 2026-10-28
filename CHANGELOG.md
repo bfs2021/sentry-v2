@@ -14,6 +14,8 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 - A policy with an empty `name` was accepted, leaving a blank column in
   `sentry-v2ctl policies` and an empty value in the metric labels. It is now
   refused when the config loads.
+- `sentry-v2ctl policy test --event` on a missing file said the event was the
+  wrong shape instead of naming the file it could not read.
 
 ## [0.2.7] - 2026-10-28
 

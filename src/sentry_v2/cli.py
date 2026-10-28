@@ -422,7 +422,10 @@ def _test(args: argparse.Namespace) -> int:
     except ConfigError as e:
         print(f"invalid: {_clean(e)}", file=sys.stderr)
         return 1
-    except (OSError, ValueError, TypeError, KeyError) as e:
+    except OSError as e:
+        print(f"cannot read {_clean(e.filename or args.event)}: {_clean(e)}", file=sys.stderr)
+        return 1
+    except (ValueError, TypeError, KeyError) as e:
         print(
             f"cannot use {_clean(args.event)}: {_clean(e)}. Expected a JSON event or a list.",
             file=sys.stderr,

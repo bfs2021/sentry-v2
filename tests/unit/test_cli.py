@@ -327,6 +327,14 @@ def test_policy_test_bad_input(tmp_path, capsys):
     assert main(["policy", "test", "--event", str(f), *CFG]) == 1
 
 
+def test_policy_test_missing_event_file(tmp_path, capsys):
+    f = tmp_path / "missing.json"
+    assert main(["policy", "test", "--event", str(f), *CFG]) == 1
+    err = capsys.readouterr().err
+    assert err.startswith(f"cannot read {f}:")
+    assert "Expected a JSON event" not in err
+
+
 def test_client_bad_replies(stub, capsys):
     stub.replies["status"] = b'{"id":1,"ok":tr'  # closes after half a line
     rc, _, err = run(stub, capsys, "status")
