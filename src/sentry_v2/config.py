@@ -9,6 +9,7 @@ import tomllib
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Literal, TypeVar, cast
+from urllib.parse import urlsplit
 
 from .config_types import (
     Config,
@@ -291,6 +292,8 @@ def _url(r: _Reader) -> str:
     url = r.require("url", _str)
     if not url.startswith("https://"):
         raise r.error("url", "must start with https://")
+    if not urlsplit(url).hostname:
+        raise r.error("url", "must include a host")
     return url
 
 

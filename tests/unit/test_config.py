@@ -172,6 +172,8 @@ def test_window_must_be_a_multiple_of_2s(tmp_path: Path, threshold: str) -> None
     ("main", "key"),
     [
         ('[sinks.webhook]\nurl = "http://a.example"', "sinks.webhook.url"),
+        ('[sinks.webhook]\nurl = "https://"', "sinks.webhook.url"),
+        ('[sinks.elastic]\nurl = "https://"', "sinks.elastic.url"),
         ("[sinks.webhook]", "sinks.webhook.url"),
         ('[sinks.webhook]\nurl = "https://a.example"', "sinks.webhook.hmac_key_file"),
         (
