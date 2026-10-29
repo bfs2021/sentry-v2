@@ -6,6 +6,12 @@ All notable changes to Sentry-v2 are recorded here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Webhook retries wait at most 5 minutes between attempts, so an endpoint
+  fixed during the retry hour is used within 5 minutes instead of up to
+  half an hour later.
+
 ## [0.2.8] - 2026-10-28
 
 ### Changed

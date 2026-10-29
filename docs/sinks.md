@@ -115,7 +115,7 @@ spooled earlier, and the spool is drained again when the daemon starts.
 |---|---|
 | 2xx | Delivered; removed from the spool. |
 | 400, 413, 415, 422 | The receiver rejected this bundle, and sending it again won't help. It's dropped from the spool and counted as a failure. |
-| Any other status (3xx, 401, 403, 404, 5xx), timeouts, connection and TLS errors | Retried with exponential backoff and jitter (waits of up to 1 s, 2 s, 4 s and so on) for up to an hour. Then it stays spooled for the next send or the next start. |
+| Any other status (3xx, 401, 403, 404, 5xx), timeouts, connection and TLS errors | Retried with exponential backoff and jitter (waits of 1 s, 2 s, 4 s and so on, never more than 5 minutes apart) for up to an hour. Then it stays spooled for the next send or the next start. |
 
 401, 403 and 404 stay spooled on purpose: they're usually a wrong URL or
 key, and once you fix that, the backlog goes through.

@@ -82,7 +82,7 @@ def test_server_down_spools_then_restart_resends_in_order(
     for b in bundles:
         with pytest.raises(SinkError, match="giving up"):
             asyncio.run(sink.send(b))
-    # backoff 1, 2, 4, ... capped at 3600, and the whole retry stays within an hour
+    # backoff 1, 2, 4, ... capped at 300, and the whole retry stays within an hour
     assert t.sleeps[:4] == [1, 2, 4, 8]
     assert sum(t.sleeps[:12]) <= 3600
     assert [x["id"] for _, x in Spool(tmp_path).pending()] == [b["id"] for b in bundles]
@@ -92,6 +92,21 @@ def test_server_down_spools_then_restart_resends_in_order(
         asyncio.run(restarted.flush())
         assert [json.loads(r.body)["id"] for r in server.requests] == [b["id"] for b in bundles]
     assert list(Spool(tmp_path).pending()) == []
+
+
+def test_full_hour_of_retries_never_waits_more_than_five_minutes(
+    tls_cert: tuple[Path, Path], tmp_path: Path
+) -> None:
+    port = _free_port()  # nothing listens here, so every attempt fails
+    t = FakeTime()
+    sink = _sink(f"https://127.0.0.1:{port}/hook", tls_cert[0], tmp_path, t)
+    with pytest.raises(SinkError, match="giving up"):
+        asyncio.run(sink.send(make_bundle()))
+    # the retry window is still an hour and the first waits are unchanged
+    assert t.now >= 3600
+    assert t.sleeps[:4] == [1, 2, 4, 8]
+    # a fixed endpoint is used within five minutes, not up to half an hour later
+    assert max(t.sleeps) <= 300
 
 
 def test_success_also_resends_older_spooled(

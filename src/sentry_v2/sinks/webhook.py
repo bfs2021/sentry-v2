@@ -18,7 +18,7 @@ from .spool import Spool
 log = logging.getLogger(__name__)
 
 RETRY_FOR = 3600.0
-MAX_DELAY = 3600.0
+MAX_DELAY = 300.0  # a fixed endpoint is picked up within five minutes
 
 
 # The bundle itself is unacceptable; retrying cannot help. Anything else (3xx,
